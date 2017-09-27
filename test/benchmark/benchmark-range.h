@@ -7,7 +7,7 @@ using namespace gen;
 
 inline void benchamerk_range1()
 {
-	std::cout << std::fixed << "=================benchamerk_range1=====================" << std::endl;
+	/*std::cout << std::fixed << "=================benchamerk_range1=====================" << std::endl;
 	int nr = 100000;
 	{
 		int count = 0;
@@ -67,7 +67,7 @@ inline void benchamerk_range1()
 	}
 	std::cout << std::fixed << "__________________________________________________________" << std::endl;
 	std::cout << std::endl;
-	std::cout << std::endl;
+	std::cout << std::endl;*/
 }
 
 

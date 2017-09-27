@@ -16,33 +16,126 @@ namespace gen
 
 
 
-
-	template<typename RED, typename T>
-	class ReduceBase : public IGenForward<ReduceBase<RED, T>, typename T::value_type>
+	template<typename T>
+	class Reduce : public IGen<Reduce<T>, typename T::value_type>
 	{
 	public:
 		//typedef RED generator_type;
 
 	protected:
 
-		T gen_begin_;
-		T gen_end_;
-		std::vector<value_type> init_;		// Not currently used. ment for advance reduce. Remove it... place it in advance reduce???
-		std::function<value_type(value_type, value_type)> binary_op_;
+		const T gen_begin_;
+		const T gen_end_;
+		T gen_itr_;
+		//std::vector<value_type> init_;		// Not currently used. ment for advance reduce. Remove it... place it in advance reduce???
+		const std::function<value_type(value_type, value_type)> binary_op_;
+
+
+		constexpr Reduce(const T & gen_begin, const T & gen_end,
+			std::function<value_type(value_type, value_type)> binary_op, 
+			T gen_itr, typename T::value_type value, bool finished)
+			:
+			IGen<Reduce<T>, typename T::value_type>(value, finished),
+			binary_op_(binary_op), gen_begin_(gen_begin), gen_end_(gen_end), gen_itr_(gen_itr)
+		{
+		}		
 
 	public:
 
-		ReduceBase(T gen, std::vector<value_type> init, std::function<value_type(value_type, value_type)> binary_op) :
-			init_(init), binary_op_(binary_op)
+		constexpr Reduce(const T & gen, std::function<value_type(value_type, value_type)> binary_op) :
+			IGen<Reduce<T>, typename T::value_type>(*std::begin(gen), false),
+			binary_op_(binary_op), gen_begin_(gen), gen_end_(std::end(gen)), gen_itr_(gen)
 		{
-			gen_begin_ = std::begin(gen);
-			gen_end_ = std::end(gen);
-			value_ = *gen_begin_;
 		}
-		ReduceBase(T gen_begin, T gen_end, std::vector<value_type> init, std::function<value_type(value_type, value_type)> binary_op) :
-			gen_begin_(gen_begin), gen_end_(gen_end), init_(init), binary_op_(binary_op)
+		constexpr Reduce(T gen_begin, T gen_end, std::function<value_type(value_type, value_type)> binary_op) :
+			IGen<Reduce<T>, typename T::value_type>(*gen_begin, false),
+			gen_begin_(gen_begin), gen_end_(gen_end), binary_op_(binary_op), gen_itr_(gen_begin)
 		{
-			value_ = *gen_begin;
+		}
+
+		inline Reduce& operator++()
+		{
+			if (gen_itr_ != gen_end_)
+			{
+				value_ = binary_op_(value_, *gen_itr_);
+				++gen_itr_;
+			}
+			else
+				finished_ = true;
+
+			return *this;
+		}
+		inline Reduce& operator++(int)
+		{
+			return this->operator++();
+		}
+
+		constexpr Reduce begin() const
+		{
+			return Reduce(gen_begin_, gen_end_, binary_op_);
+		}
+
+		constexpr Reduce end() const
+		{
+			return Reduce(gen_begin_, gen_end_, binary_op_, gen_itr_, value_, true);
+		}
+	};
+
+
+	template<typename T>
+	constexpr Reduce<T> reduce(T gen)
+	{
+		return Reduce<T>(gen, std::plus<T::value_type>());
+	}
+	template<typename T>
+	constexpr Reduce<T> reduce(T begin, T end)
+	{
+		return Reduce<T>(begin, end, std::plus<T::value_type>());
+	}
+
+	template<typename T>
+	constexpr Reduce<T> reduce(T gen, std::function<decltype(T::value_type())(decltype(T::value_type()), decltype(T::value_type()))> binary_op)
+	{
+		return Reduce<T>(gen, binary_op);
+	}
+	template<typename T>
+	constexpr Reduce<T> reduce(T begin, T end, std::function<decltype(T::value_type())(decltype(T::value_type()), decltype(T::value_type()))> binary_op)
+	{
+		return Reduce<T>(begin, end, binary_op);
+	}
+
+
+
+	/*template<typename RED, typename T>
+	class ReduceBase : public IGen<ReduceBase<RED, T>, typename T::value_type>
+	{
+	public:
+		//typedef RED generator_type;
+
+	protected:
+
+		const T gen_begin_;
+		const T gen_end_;
+		std::vector<value_type> init_;		// Not currently used. ment for advance reduce. Remove it... place it in advance reduce???
+		std::function<value_type(value_type, value_type)> binary_op_;
+
+
+
+	public:
+
+		constexpr ReduceBase(T gen, std::vector<value_type> init, std::function<value_type(value_type, value_type)> binary_op) :
+			IGen<Range<VAL>, VAL>(start, false),
+			init_(init), binary_op_(binary_op), gen_begin_(std::begin(gen)), gen_end_(std::end(gen)), 
+		{
+			// = std::begin(gen);
+			//gen_end_ = std::end(gen);
+			//value_ = *gen_begin_;
+		}
+		constexpr ReduceBase(T gen_begin, T gen_end, std::vector<value_type> init, std::function<value_type(value_type, value_type)> binary_op) :
+			IGen<Range<VAL>, VAL>(start, false),
+			gen_begin_(gen_begin), gen_end_(gen_end), init_(init), binary_op_(binary_op), 
+		{
+			//value_ = *gen_begin;
 		}
 
 
@@ -51,12 +144,12 @@ namespace gen
 			return this->operator++();
 		}
 
-		RED begin()
+		constexpr RED begin()
 		{
 			return RED(gen_begin_, gen_end_, init_, binary_op_);
 		}
 
-		RED end()
+		constexpr RED end()
 		{
 			auto ret = RED(gen_begin_, gen_end_, init_, binary_op_);
 			ret.finished_ = true;
@@ -87,9 +180,11 @@ namespace gen
 			return *this;
 		}
 	};
+	*/
 
 
-	template<typename T>
+
+	/*template<typename T>
 	Reduce<T> reduce(T gen)
 	{
 		return Reduce<T>(gen, std::vector<decltype(T::value_type())> {}, std::plus<T::value_type>());
@@ -109,7 +204,7 @@ namespace gen
 	Reduce<T> reduce(T begin, T end, std::function<decltype(T::value_type())(decltype(T::value_type()), decltype(T::value_type()))> binary_op)
 	{
 		return Reduce<T>(begin, end, std::vector<decltype(T::value_type())> {}, binary_op);
-	}
+	}*/
 
 
 

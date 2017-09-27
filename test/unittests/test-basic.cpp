@@ -7,6 +7,14 @@
 
 using namespace gen;
 
+
+TEST(BaseicOperations, FinishedConstexptr2)
+{
+	static_assert(finished(range(2)) == false, "");
+	
+	EXPECT_EQ(true, true);
+}
+
 TEST(BaseicOperations, Finished)
 {	
 	auto r = range(2);

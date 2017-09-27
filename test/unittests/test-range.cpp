@@ -6,10 +6,59 @@
 using namespace gen;
 
 
+
+TEST(RangeTest, Constexpr1)
+{
+	static_assert(range(0, 5, 1) == range(0, 5, 1), "");
+	static_assert(range(0, 5) == range(0, 5), "");
+	static_assert(range(0, -5) == range(0, -5), "");
+	static_assert(range(5) == range(5), "");
+	static_assert(range(-5) == range(-5), "");
+
+	constexpr Range<int> test_range1 = range(2);
+	constexpr Range<int> test_range2(test_range1);
+	static_assert(test_range2 == test_range1, "");
+
+
+	static_assert(range(5).begin() == range(-5).begin(), "");	
+	static_assert(range(5).end() == range(-5).end(), "");
+
+	constexpr Range<int> test_range = range(2);
+	//++test_range;
+	//++test_range;
+	//++test_range;
+	static_assert(test_range == range(2), "");
+	//static_assert(++test_range == range(2), "");
+	//static_assert(test_range+1 == range(2), "");
+
+	//static_assert(range(5).begin() == range(-5).end(), "");	// OK. It fails
+	//static_assert(range(5, -5, -1) == range(0, 5, 1), "");	// Succes. Not good. Currently strange. not logical !!!!!!
+
+
+	//Range<int> test_range2 = range(2);
+	//test_range2 = test_range2 + 1;
+
+	EXPECT_EQ(5, 5);
+}
+
+
+TEST(RangeTest, RangeOtherInc)
+{
+
+	auto r = range(5);
+	//r += 2;		// TODO: make it work
+	//r++;
+	//++r;
+	EXPECT_EQ(2, 2);
+}
+
+
 //////////////////////////////////
 //
 //		For types
 //
+
+
 
 TEST(RangeTest, RangeFor)
 {
@@ -79,7 +128,7 @@ TEST(RangeTest, TwoArgPos)
 
 
 TEST(RangeTest, ThreeArgPos)
-{
+{	
 	int count = 0;
 	for (auto i : range(1, 5, 1))
 		++count;

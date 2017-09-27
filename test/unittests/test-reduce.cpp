@@ -10,6 +10,19 @@
 using namespace gen;
 
 
+TEST(ReduceTest, Constexpr1)
+{
+	//static_assert(reduce(range(5)) == reduce(range(5)), "");
+
+	static_assert(std::plus<int>()(1, 1) == std::plus<int>()(1, 1), "");
+
+	//assert(std::plus(1, 1) == std::plus(1, 1), "");
+
+	EXPECT_EQ(std::plus<int>()(1, 1), std::plus<int>()(1, 1));
+
+	EXPECT_EQ(5, 5);
+}
+
 //////////////////////////////////
 //
 //		

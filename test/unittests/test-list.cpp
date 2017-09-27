@@ -10,6 +10,7 @@
 #include "list.h"
 
 
+
 TEST(List, Vector1)
 {
 	auto a = gen::list(gen::range(2));

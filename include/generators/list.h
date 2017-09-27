@@ -6,11 +6,11 @@ namespace gen
 {
 
 	// TODO: Look for a better name, if anny.... make_container, ...
-
+	// TODO: use iterator tag to customize for speed, if posible
 	// TODO: make template specialistations struct list_helper to optimize against specific containers
 
 	template<typename T, typename GEN>
-	T& list(T& li, GEN& gen)
+	T& list(T& li, const GEN & gen)
 	{	
 
 		for (auto i : gen)
@@ -24,7 +24,7 @@ namespace gen
 		template <class, class> class T = std::vector,
 		typename GEN
 	>
-		auto list(GEN& gen)
+		auto list(const GEN & gen)
 	{
 		T<
 			GEN::value_type,
@@ -40,7 +40,7 @@ namespace gen
 		template <class, class, class> class T,
 		typename GEN
 	>
-		auto list(GEN& gen)
+		auto list(const GEN & gen)
 	{
 		T<
 			GEN::value_type,
@@ -57,7 +57,7 @@ namespace gen
 		template <class, class, class, class> class T,
 		typename GEN
 	>
-		auto list(GEN& gen)
+		auto list(const GEN & gen)
 	{
 		T<
 			GEN::value_type,

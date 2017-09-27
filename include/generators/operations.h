@@ -6,7 +6,7 @@ namespace gen
 {
 
 	template<typename TT>
-	bool finished(const TT& gen)
+	constexpr bool finished(const TT & gen)
 	{
 		return gen.finished_;
 	}

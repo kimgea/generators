@@ -4,6 +4,14 @@
 
 namespace gen
 {
+	template<class t>
+	constexpr t abs_custom(t x)
+	{	// std::abs dis not work in constexpr
+		return x < 0 ? -x : x;
+	}
+
+	////////////////////////////////
+	
 	template<typename T, typename V>
 	class IGen
 	{
@@ -15,58 +23,68 @@ namespace gen
 		bool finished_{ false };
 		V value_;
 
+		constexpr IGen() : value_(0), finished_(true) {}	// end()
+
 	public:
 
-		V const & operator*() const
+		constexpr IGen(V value, bool finished) : value_(value), finished_(finished) {}
+
+		constexpr V const & operator*() const
 		{
 			return value_;
 		}
 
-		operator V()
+		constexpr operator V() const
 		{
 			return value_;
 		}
 
-		T begin()
+		/*constexpr T begin() const
 		{
 			return static_cast<T*>(this)->begin();
 		}
 
-		T end()
+		constexpr T end() const
 		{
 			return static_cast<T*>(this)->end();
-		}
+		}*/
 
 
 		// Only compares if it is finished or not
-		friend bool operator==(const T& left, const T& right)
+		constexpr bool operator==(const T& right) const
 		{
-			return (left.finished_ == right.finished_);
+			return (finished_ == right.finished_);
 		}
-		friend bool operator!=(const T& left, const T& right)
+		constexpr bool operator!=(const T& right) const
 		{
-			return (left.finished_ != right.finished_);
+			return (finished_ != right.finished_);
 		}
 
 		template<typename TT>
-		friend bool finished(const TT& gen);
+		friend constexpr bool finished(const TT& gen);
 	};
 
 
 	// TODO: Might remove this. Forward is probably the only one... so it could be moved into IGen
-	template<typename T, typename V>
+	/*template<typename T, typename V>
 	class IGenForward : public IGen<IGenForward<T, V>, V>
 	{
-		T& operator++()
+	protected:
+		constexpr IGenForward() : IGen<IGenForward<T, V>, V>() {}
+	public:
+		constexpr IGenForward(V value, bool finsihed) : IGen<IGenForward<T, V>, V>(value, finsihed) {}
+
+		// TODO: Why did i make this ???
+		inline T& operator++()
 		{
 			return static_cast<T*>(this)->operator++();
 		}
 
-		T& operator++(int)
+		inline T& operator++(int)
 		{
-			return this->operator++();;
+			return this->operator++();
 		}
-	};
+	};*/
 
 
 }
